@@ -17,6 +17,7 @@ export function Education() {
   return (
     <Section
       id="education"
+      index={6}
       eyebrow="Education & Credentials"
       title="Foundations"
     >
@@ -31,7 +32,7 @@ export function Education() {
             transition={{ duration: 0.4, delay: (i % 4) * 0.07 }}
           >
             <Card className="h-full text-center hover:-translate-y-1">
-              <span className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 text-secondary">
+              <span className="icon-tile mx-auto mb-3 h-11 w-11">
                 <DynIcon name={a.icon} className="h-5 w-5" />
               </span>
               <div className="font-display font-semibold">{a.title}</div>

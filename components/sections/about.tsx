@@ -10,6 +10,7 @@ export function About() {
   return (
     <Section
       id="about"
+      index={1}
       eyebrow="About"
       title={
         <>

@@ -15,16 +15,18 @@ const config: Config = {
     },
     extend: {
       colors: {
-        // Driven by CSS variables in globals.css so dark/light both work.
+        // Driven by CSS variables in globals.css.
         bg: "hsl(var(--bg) / <alpha-value>)",
         surface: "hsl(var(--surface) / <alpha-value>)",
         elevated: "hsl(var(--elevated) / <alpha-value>)",
-        border: "hsl(var(--border) / <alpha-value>)",
+        border: "rgba(255,255,255,0.08)", // hairline
         fg: "hsl(var(--fg) / <alpha-value>)",
         muted: "hsl(var(--muted) / <alpha-value>)",
-        // Brand palette (fixed hues from the brief).
+        dim: "hsl(var(--dim) / <alpha-value>)",
+        // Brand palette. Cyan is the single signature accent; blue + violet
+        // are secondary and used sparingly (CTA gradients, a few key words).
         primary: "#2563EB",
-        secondary: "#06B6D4",
+        secondary: "#06B6D4", // the signature accent (also --accent)
         accent: "#7C3AED",
       },
       fontFamily: {
@@ -44,18 +46,13 @@ const config: Config = {
           "100%": { strokeDashoffset: "0", opacity: "0.15" },
         },
         "node-breathe": {
-          "0%, 100%": { opacity: "0.35", transform: "scale(1)" },
-          "50%": { opacity: "1", transform: "scale(1.15)" },
-        },
-        "gradient-drift": {
-          "0%, 100%": { transform: "translate3d(0,0,0) scale(1)" },
-          "50%": { transform: "translate3d(3%, -4%, 0) scale(1.08)" },
+          "0%, 100%": { opacity: "0.4", transform: "scale(1)" },
+          "50%": { opacity: "1", transform: "scale(1.18)" },
         },
       },
       animation: {
         "edge-pulse": "edge-pulse 3.2s ease-in-out infinite",
         "node-breathe": "node-breathe 4s ease-in-out infinite",
-        "gradient-drift": "gradient-drift 18s ease-in-out infinite",
       },
     },
   },

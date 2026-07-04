@@ -8,11 +8,13 @@ import { cn } from "@/lib/utils";
 import { projects } from "@/lib/data";
 
 const featured = projects.filter((p) => p.category === "featured");
-
-// Build filter set from the tech that actually appears in featured projects.
 const FILTERS = ["All", "LangGraph", "RAG", "FastAPI", "VLMs", "MySQL"] as const;
 
-export function FeaturedProjects() {
+export function FeaturedProjects({
+  onOpen,
+}: {
+  onOpen: (slug: string) => void;
+}) {
   const [filter, setFilter] =
     React.useState<(typeof FILTERS)[number]>("All");
 
@@ -26,11 +28,11 @@ export function FeaturedProjects() {
   return (
     <Section
       id="projects"
+      index={4}
       eyebrow="Featured Projects"
       title="Systems, not demos"
-      intro="Each of these went end to end — architecture, backend, and interface. Open any card for the full case study."
+      intro="Each of these went end to end. Click any card for the full case study."
     >
-      {/* Filter chips */}
       <div className="mb-8 flex flex-wrap gap-2">
         {FILTERS.map((f) => (
           <button
@@ -51,7 +53,7 @@ export function FeaturedProjects() {
       <motion.div layout className="grid gap-6 lg:grid-cols-2">
         {visible.map((p) => (
           <motion.div key={p.slug} layout>
-            <ProjectCard project={p} />
+            <ProjectCard project={p} onOpen={onOpen} />
           </motion.div>
         ))}
       </motion.div>

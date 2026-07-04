@@ -125,6 +125,7 @@ export function Contact() {
   return (
     <Section
       id="contact"
+      index={7}
       eyebrow="Contact"
       title={
         <>
@@ -146,7 +147,7 @@ export function Contact() {
           {channels.map((c) => {
             const Inner = (
               <Card className="flex items-center gap-4 hover:-translate-y-1">
-                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 text-secondary">
+                <span className="icon-tile h-11 w-11">
                   <c.icon className="h-5 w-5" />
                 </span>
                 <div className="min-w-0">
@@ -208,14 +209,24 @@ export function Contact() {
               </div>
             </div>
             <div>
-              <label htmlFor="c-msg" className="mb-1.5 block text-xs text-muted">
-                Message
-              </label>
+              <div className="mb-1.5 flex items-center justify-between">
+                <label htmlFor="c-msg" className="block text-xs text-muted">
+                  Message
+                </label>
+                <span
+                  className={`font-mono text-[0.7rem] ${
+                    message.length >= 900 ? "text-secondary" : "text-dim"
+                  }`}
+                >
+                  {message.length} / 1000
+                </span>
+              </div>
               <textarea
                 id="c-msg"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 rows={5}
+                maxLength={1000}
                 placeholder="What would you like to build?"
                 className={`${inputCls} resize-none`}
               />

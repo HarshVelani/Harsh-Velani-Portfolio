@@ -10,6 +10,7 @@ export function Experience() {
   return (
     <Section
       id="experience"
+      index={3}
       eyebrow="Experience"
       title="Where I've shipped"
       intro="A short, dense timeline — three roles, one trajectory toward production AI."
@@ -38,7 +39,7 @@ export function Experience() {
                   {role.role}
                   <span className="text-muted"> · {role.company}</span>
                 </h3>
-                <span className="font-mono text-xs text-muted">
+                <span className="font-mono text-xs text-secondary">
                   {role.period}
                 </span>
               </div>

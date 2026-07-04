@@ -3,28 +3,21 @@
 @tailwind utilities;
 
 @layer base {
+  /* Dark-only "Latent Space" palette. */
   :root {
-    /* Font families (self-hosted via Fontsource; see app/layout.tsx). */
+    /* Fonts (self-hosted via Fontsource; see app/layout.tsx). */
     --font-display: "Space Grotesk Variable";
     --font-sans: "Inter Variable";
     --font-mono: "JetBrains Mono Variable";
 
-    /* Dark is the primary identity (OpenAI/Linear/Vercel register). */
-    --bg: 222 47% 7%; /* #0F172A-ish */
-    --surface: 222 40% 10%;
-    --elevated: 222 33% 14%;
-    --border: 222 25% 20%;
-    --fg: 210 40% 98%; /* #F8FAFC */
-    --muted: 215 20% 65%;
-  }
+    --bg: 225 43% 5%; /* #080B14 */
+    --surface: 222 40% 8%;
+    --elevated: 222 30% 12%;
+    --fg: 210 40% 96%; /* #F1F5F9 */
+    --muted: 215 20% 65%; /* #94A3B8 */
+    --dim: 215 16% 47%; /* #64748B */
 
-  .light {
-    --bg: 210 40% 98%; /* #F8FAFC */
-    --surface: 0 0% 100%;
-    --elevated: 210 40% 96%;
-    --border: 214 32% 88%;
-    --fg: 222 47% 11%; /* #0F172A */
-    --muted: 215 16% 42%;
+    --accent: #06b6d4; /* signature cyan */
   }
 
   * {
@@ -33,19 +26,18 @@
 
   html {
     scroll-behavior: smooth;
-    scroll-padding-top: 5rem; /* offset for fixed nav */
+    scroll-padding-top: 5.5rem;
   }
 
   body {
-    @apply bg-bg text-fg font-sans antialiased;
+    @apply bg-bg font-sans text-fg antialiased;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
   ::selection {
-    @apply bg-accent/30 text-fg;
+    @apply bg-secondary/25 text-fg;
   }
 
-  /* Slim, on-brand scrollbar. */
   ::-webkit-scrollbar {
     width: 10px;
     height: 10px;
@@ -54,28 +46,38 @@
     @apply bg-transparent;
   }
   ::-webkit-scrollbar-thumb {
-    @apply rounded-full bg-border;
+    @apply rounded-full;
+    background: rgba(255, 255, 255, 0.12);
   }
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-muted;
+    background: rgba(255, 255, 255, 0.2);
   }
 }
 
 @layer components {
-  /* The brand gradient text treatment, used sparingly on key words. */
+  /* Reserve the tri-gradient for 2-3 key words only. */
   .text-gradient {
     @apply bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent;
   }
 
-  /* Glass surface (fill + blur only; the edge is the ParticleBorder). */
+  /* Card fill; the 1px hairline + hover live on the Card component. */
   .glass {
-    @apply bg-white/[0.03] backdrop-blur-xl;
-  }
-  .light .glass {
-    @apply bg-white/70;
+    background: rgba(255, 255, 255, 0.022);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
   }
 
-  /* Traveling dots for ParticleBorder (frozen under reduced-motion below). */
+  /* Editorial eyebrow text (the number + name markup lives in Section). */
+  .section-eyebrow {
+    @apply inline-flex items-center gap-3 font-mono text-[0.74rem] uppercase tracking-[0.2em] text-secondary;
+  }
+
+  /* Gradient icon tile used by skills / education / contact cards. */
+  .icon-tile {
+    @apply flex items-center justify-center rounded-xl bg-gradient-to-br from-primary/25 via-secondary/20 to-accent/25 text-secondary;
+  }
+
+  /* Traveling dots for the (optional) ParticleBorder. */
   @keyframes pb-travel {
     to {
       stroke-dashoffset: -7.5;
@@ -85,9 +87,7 @@
     animation: pb-travel 3.5s linear infinite;
   }
 
-  /* Tech-stack marquee (moved out of an inline <style> to avoid a hydration
-     mismatch: React escaped the ">" child combinator differently on server vs
-     client). Animation lives on classes so the hover-pause rule can win. */
+  /* Tech-stack marquee (in globals to avoid an inline <style> hydration issue). */
   @keyframes marquee-l {
     from {
       transform: translateX(0);
@@ -114,30 +114,8 @@
   .tech-marquee-row:hover .marquee-r {
     animation-play-state: paused;
   }
-
-  /* Dotted gradient divider, the line-shaped sibling of the particle border. */
-  .dot-divider {
-    height: 1.5px;
-    background-image: linear-gradient(90deg, #2563eb, #06b6d4, #7c3aed);
-    -webkit-mask-image: repeating-linear-gradient(
-      90deg,
-      #000 0 2px,
-      transparent 2px 9px
-    );
-    mask-image: repeating-linear-gradient(
-      90deg,
-      #000 0 2px,
-      transparent 2px 9px
-    );
-    opacity: 0.45;
-  }
-
-  .section-eyebrow {
-    @apply mb-3 inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.25em] text-secondary;
-  }
 }
 
-/* Respect users who prefer reduced motion. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

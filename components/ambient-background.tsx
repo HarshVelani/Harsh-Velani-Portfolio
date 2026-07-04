@@ -3,275 +3,168 @@
 import { useEffect, useRef } from "react";
 
 /**
- * AmbientBackground - a site-wide ambient atmosphere.
+ * AmbientBackground — a page-wide "neural field" (inspired by Google
+ * Antigravity's whole-page particle system, tuned for AI/ML content).
  *
- * A sparse field of small drifting dashes, evoking points in an embedding /
- * latent space (a nod to the vector databases at the core of the stack).
- * Rendered once in the root layout as a fixed, viewport-sized layer behind all
- * content, so the field sits behind every section as you scroll. Because it is
- * fixed to the viewport (not the full document), it stays cheap.
+ * - Uniform, edge-to-edge particles that drift gently UPWARD ("anti-gravity")
+ *   and wrap; a free-flowing constellation of nearest-neighbour links.
+ * - Cursor repulsion (particles push away, spring back).
+ * - A periodic RAG / vector-search pulse: a random "query" point lights up,
+ *   connects to its nearest neighbours, and an expanding similarity ring pulses
+ *   out, then fades (~every 6s).
  *
- * Cursor interaction: dashes within a radius of the pointer are pushed
- * outward, rotate to orient around it (like iron filings around a magnet),
- * and brighten. Displacement is spring-damped, so everything eases back to
- * rest when the pointer leaves. The whole effect is skipped for reduced-motion
- * users and pauses while the tab is hidden.
- *
- * Tunables (top of the effect): INTERACT_RADIUS, PUSH, SPRING, DAMP.
+ * Pure canvas, capped by viewport area, ResizeObserver-sized (robust to late
+ * layout), paused when the tab is hidden, single static frame under
+ * prefers-reduced-motion. Drop-in replacement for components/ambient-background.tsx.
  */
-
-const COLORS = ["#2563EB", "#06B6D4", "#7C3AED"];
-
-interface Dash {
-  homeX: number;
-  homeY: number;
-  vx: number;
-  vy: number;
-  baseAngle: number;
-  len: number;
-  alpha: number;
-  twinkle: number;
-  twinkleSpeed: number;
-  color: string;
-  width: number;
-  offX: number;
-  offY: number;
-  offVx: number;
-  offVy: number;
-  falloff: number; // 0..1 proximity to cursor, computed each frame
+interface Props {
+  accent?: string;
+  enabled?: boolean;
 }
 
-function hexToRgba(hex: string, a: number): string {
-  const n = parseInt(hex.slice(1), 16);
-  return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${a})`;
-}
-
-export function AmbientBackground() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+export function AmbientBackground({ accent = "#06B6D4", enabled = true }: Props) {
+  const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    const parent = canvas?.parentElement;
+    const canvas = ref.current;
     const ctx = canvas?.getContext("2d");
-    if (!canvas || !parent || !ctx) return;
+    if (!canvas || !ctx || !enabled) return;
 
-    // ---- Interaction tunables ----
-    const INTERACT_RADIUS = 150; // px around the cursor that feels the push
-    const PUSH = 0.6; // outward acceleration strength
-    const SPRING = 0.06; // pull back toward rest position
-    const DAMP = 0.82; // velocity damping (keeps it stable)
-
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const reduce = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
-
-    let width = 0;
-    let height = 0;
-    let dashes: Dash[] = [];
-    let raf = 0;
-
-    // Cursor state (in CSS px relative to the canvas). Starts inactive.
-    let cx = -9999;
-    let cy = -9999;
-    let active = false;
-    let rect = parent.getBoundingClientRect();
-
-    const dashCount = () =>
-      Math.min(90, Math.max(26, Math.round((width * height) / 16000)));
-
-    const makeDash = (): Dash => {
-      const dir = -Math.PI / 3 + (Math.random() - 0.5) * 1.2;
-      const speed = 0.05 + Math.random() * 0.12;
-      return {
-        homeX: Math.random() * width,
-        homeY: Math.random() * height,
-        vx: Math.cos(dir) * speed,
-        vy: Math.sin(dir) * speed,
-        baseAngle: Math.random() * Math.PI,
-        len: 6 + Math.random() * 10,
-        alpha: 0.16 + Math.random() * 0.34,
-        twinkle: Math.random() * Math.PI * 2,
-        twinkleSpeed: 0.005 + Math.random() * 0.01,
-        color: COLORS[(Math.random() * COLORS.length) | 0],
-        width: Math.random() < 0.2 ? 1.6 : 1,
-        offX: 0,
-        offY: 0,
-        offVx: 0,
-        offVy: 0,
-        falloff: 0,
-      };
+    const COLORS = [accent, "#2563EB", "#7C3AED"];
+    const rgba = (hex: string, a: number) => {
+      const n = parseInt(hex.slice(1), 16);
+      return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
     };
 
-    const seed = () => {
-      dashes = Array.from({ length: dashCount() }, makeDash);
-    };
+    type P = { x: number; y: number; vx: number; vy: number; r: number; c: string; tw: number; ts: number; ox: number; oy: number; ovx: number; ovy: number };
+    let W = 0, H = 0, pts: P[] = [], cx = -9999, cy = -9999, active = false, raf = 0;
+    let qIdx = -1, qClock = 0, qNbr: number[] = [];
+    const R = 150, LINKD = 132;
 
+    const rnd = (a: number, b: number) => a + Math.random() * (b - a);
+    const count = () => Math.min(190, Math.max(60, Math.round((W * H) / 9000)));
+    const make = (): P => ({
+      x: Math.random() * W, y: Math.random() * H,
+      vx: rnd(-0.07, 0.07), vy: rnd(-0.12, -0.02), // drift upward, slow
+      r: rnd(0.6, 1.9), c: COLORS[(Math.random() * COLORS.length) | 0],
+      tw: Math.random() * 6.28, ts: 0.003 + Math.random() * 0.006,
+      ox: 0, oy: 0, ovx: 0, ovy: 0,
+    });
+    const seed = () => { pts = Array.from({ length: count() }, make); qIdx = -1; qClock = 0; };
     const resize = () => {
-      rect = parent.getBoundingClientRect();
-      width = rect.width;
-      height = rect.height;
-      canvas.width = Math.floor(width * dpr);
-      canvas.height = Math.floor(height * dpr);
-      canvas.style.width = `${width}px`;
-      canvas.style.height = `${height}px`;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      seed();
+      W = window.innerWidth; H = window.innerHeight;
+      canvas.width = Math.floor(W * dpr); canvas.height = Math.floor(H * dpr);
+      canvas.style.width = W + "px"; canvas.style.height = H + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0); seed();
     };
 
     const step = () => {
-      const margin = 24;
-      for (const d of dashes) {
-        // Ambient drift of the rest position, wrapping at the edges.
-        d.homeX += d.vx;
-        d.homeY += d.vy;
-        if (d.homeX < -margin) d.homeX = width + margin;
-        else if (d.homeX > width + margin) d.homeX = -margin;
-        if (d.homeY < -margin) d.homeY = height + margin;
-        else if (d.homeY > height + margin) d.homeY = -margin;
-
-        const x = d.homeX + d.offX;
-        const y = d.homeY + d.offY;
-
-        // Cursor repulsion.
-        d.falloff = 0;
+      const m = 20;
+      for (const d of pts) {
+        d.x += d.vx; d.y += d.vy;
+        if (d.x < -m) d.x = W + m; else if (d.x > W + m) d.x = -m;
+        if (d.y < -m) d.y = H + m; else if (d.y > H + m) d.y = -m;
         if (active) {
-          const dx = x - cx;
-          const dy = y - cy;
-          const dist = Math.hypot(dx, dy);
-          if (dist > 0 && dist < INTERACT_RADIUS) {
-            const f = 1 - dist / INTERACT_RADIUS;
-            d.falloff = f;
-            const push = f * PUSH;
-            d.offVx += (dx / dist) * push;
-            d.offVy += (dy / dist) * push;
-          }
+          const px = d.x + d.ox, py = d.y + d.oy, dx = px - cx, dy = py - cy, dist = Math.hypot(dx, dy);
+          if (dist > 0 && dist < R) { const f = (1 - dist / R) * 0.55; d.ovx += (dx / dist) * f; d.ovy += (dy / dist) * f; }
         }
-
-        // Spring back to rest + damping.
-        d.offVx += -d.offX * SPRING;
-        d.offVy += -d.offY * SPRING;
-        d.offVx *= DAMP;
-        d.offVy *= DAMP;
-        d.offX += d.offVx;
-        d.offY += d.offVy;
-
-        d.twinkle += d.twinkleSpeed;
+        d.ovx += -d.ox * 0.05; d.ovy += -d.oy * 0.05; d.ovx *= 0.86; d.ovy *= 0.86;
+        d.ox += d.ovx; d.oy += d.ovy; d.tw += d.ts;
+      }
+      // RAG retrieval pulse: new query ~every 380 frames
+      qClock++;
+      if (qIdx < 0 || qClock > 380) {
+        qClock = 0; qIdx = pts.length ? (Math.random() * pts.length) | 0 : -1;
+        if (qIdx >= 0) {
+          const q = pts[qIdx], qx = q.x + q.ox, qy = q.y + q.oy;
+          const arr: [number, number][] = [];
+          for (let i = 0; i < pts.length; i++) {
+            if (i === qIdx) continue;
+            const b = pts[i], dx = (b.x + b.ox) - qx, dy = (b.y + b.oy) - qy;
+            arr.push([i, dx * dx + dy * dy]);
+          }
+          arr.sort((a, b) => a[1] - b[1]);
+          qNbr = arr.slice(0, 5).map((a) => a[0]);
+        }
       }
     };
 
     const draw = () => {
-      ctx.clearRect(0, 0, width, height);
-      ctx.lineCap = "round";
-      for (const d of dashes) {
-        const x = d.homeX + d.offX;
-        const y = d.homeY + d.offY;
-        const f = d.falloff;
-
-        // Orientation: blend the dash's base direction toward pointing away
-        // from the cursor as it gets closer. Blending vectors (not angles)
-        // sidesteps wraparound; a dash is symmetric so direction sign is moot.
-        let dirX = Math.cos(d.baseAngle);
-        let dirY = Math.sin(d.baseAngle);
-        if (active && f > 0) {
-          let ax = x - cx;
-          let ay = y - cy;
-          const m = Math.hypot(ax, ay) || 1;
-          ax /= m;
-          ay /= m;
-          dirX = dirX * (1 - f) + ax * f;
-          dirY = dirY * (1 - f) + ay * f;
-          const dm = Math.hypot(dirX, dirY) || 1;
-          dirX /= dm;
-          dirY /= dm;
+      ctx.clearRect(0, 0, W, H); ctx.lineCap = "round";
+      const n = pts.length, L2 = LINKD * LINKD;
+      for (let i = 0; i < n; i++) {
+        const a = pts[i], ax = a.x + a.ox, ay = a.y + a.oy;
+        for (let j = i + 1; j < n; j++) {
+          const b = pts[j], bx = b.x + b.ox, by = b.y + b.oy, dx = ax - bx, dy = ay - by, d2 = dx * dx + dy * dy;
+          if (d2 < L2) {
+            const al = (1 - Math.sqrt(d2) / LINKD) * 0.16;
+            if (al > 0.012) { ctx.strokeStyle = rgba(a.c, al); ctx.lineWidth = 0.6; ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); ctx.stroke(); }
+          }
         }
-
-        const len = d.len * (1 + f * 0.4); // grow slightly near cursor
-        const alpha =
-          d.alpha * (0.6 + 0.4 * Math.sin(d.twinkle)) * (1 + f * 0.9); // brighten near cursor
-
-        ctx.strokeStyle = hexToRgba(d.color, Math.min(alpha, 1));
-        ctx.lineWidth = d.width;
-        const hx = (dirX * len) / 2;
-        const hy = (dirY * len) / 2;
-        ctx.beginPath();
-        ctx.moveTo(x - hx, y - hy);
-        ctx.lineTo(x + hx, y + hy);
-        ctx.stroke();
+      }
+      for (let i = 0; i < n; i++) {
+        const p = pts[i], x = p.x + p.ox, y = p.y + p.oy;
+        ctx.fillStyle = rgba(p.c, 0.28 + 0.32 * (0.5 + 0.5 * Math.sin(p.tw)));
+        ctx.beginPath(); ctx.arc(x, y, p.r, 0, 6.283); ctx.fill();
+      }
+      if (qIdx >= 0 && qIdx < pts.length) {
+        const ph = qClock, ramp = Math.min(ph / 20, 1), fade = 1 - Math.max(0, (ph - 120) / 55), pulse = Math.max(0, ramp * fade);
+        if (pulse > 0.02) {
+          const q = pts[qIdx], AC = COLORS[0], qx = q.x + q.ox, qy = q.y + q.oy;
+          for (const ni of qNbr) {
+            const b = pts[ni]; if (!b) continue;
+            const bx = b.x + b.ox, by = b.y + b.oy;
+            ctx.strokeStyle = rgba(AC, pulse * 0.5); ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(qx, qy); ctx.lineTo(bx, by); ctx.stroke();
+            ctx.fillStyle = rgba(AC, pulse * 0.8); ctx.beginPath(); ctx.arc(bx, by, 2.4, 0, 6.283); ctx.fill();
+          }
+          const g = ctx.createRadialGradient(qx, qy, 0, qx, qy, 12);
+          g.addColorStop(0, rgba(AC, pulse * 0.5)); g.addColorStop(1, rgba(AC, 0));
+          ctx.fillStyle = g; ctx.beginPath(); ctx.arc(qx, qy, 12, 0, 6.283); ctx.fill();
+          ctx.fillStyle = rgba(AC, Math.min(pulse, 0.95)); ctx.beginPath(); ctx.arc(qx, qy, 3.2, 0, 6.283); ctx.fill();
+          ctx.strokeStyle = rgba(AC, pulse * 0.4); ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(qx, qy, 6 + ph * 0.5, 0, 6.283); ctx.stroke();
+        }
       }
     };
 
-    const loop = () => {
-      step();
-      draw();
-      raf = requestAnimationFrame(loop);
+    const loop = () => { step(); draw(); raf = requestAnimationFrame(loop); };
+    const onMove = (e: MouseEvent) => { cx = e.clientX; cy = e.clientY; active = true; };
+    const onLeave = () => { active = false; };
+    const onVis = () => {
+      if (document.hidden) { cancelAnimationFrame(raf); raf = 0; }
+      else if (!reduce && !raf) { raf = requestAnimationFrame(loop); }
     };
-
-    const onMove = (e: MouseEvent) => {
-      cx = e.clientX - rect.left;
-      cy = e.clientY - rect.top;
-      active =
-        cx >= 0 && cx <= width && cy >= 0 && cy <= height;
-    };
-
-    const onLeave = () => {
-      active = false;
-    };
-
-    const onScroll = () => {
-      rect = parent.getBoundingClientRect();
-    };
-
-    const onVisibility = () => {
-      if (document.hidden) {
-        cancelAnimationFrame(raf);
-        raf = 0;
-      } else if (!reduce && !raf) {
-        raf = requestAnimationFrame(loop);
-      }
-    };
+    let rt: ReturnType<typeof setTimeout>;
+    const onResize = () => { clearTimeout(rt); rt = setTimeout(() => { resize(); if (reduce) draw(); }, 150); };
 
     resize();
-
-    if (reduce) {
-      draw(); // one static frame, no animation, no interaction
-    } else {
+    let ro: ResizeObserver | undefined;
+    if (reduce) { draw(); }
+    else {
       window.addEventListener("mousemove", onMove, { passive: true });
       window.addEventListener("mouseleave", onLeave);
-      window.addEventListener("scroll", onScroll, { passive: true });
-      document.addEventListener("visibilitychange", onVisibility);
+      document.addEventListener("visibilitychange", onVis);
       raf = requestAnimationFrame(loop);
     }
-
-    let resizeTimer: ReturnType<typeof setTimeout>;
-    const onResize = () => {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(resize, 150);
-    };
     window.addEventListener("resize", onResize);
+    if ("ResizeObserver" in window) { ro = new ResizeObserver(() => onResize()); ro.observe(document.documentElement); }
 
     return () => {
       cancelAnimationFrame(raf);
-      window.removeEventListener("resize", onResize);
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("mouseleave", onLeave);
-      window.removeEventListener("scroll", onScroll);
-      document.removeEventListener("visibilitychange", onVisibility);
-      clearTimeout(resizeTimer);
+      document.removeEventListener("visibilitychange", onVis);
+      window.removeEventListener("resize", onResize);
+      ro?.disconnect();
+      clearTimeout(rt);
     };
-  }, []);
+  }, [accent, enabled]);
 
   return (
-    <div
-      aria-hidden
-      className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
-    >
-      {/* Soft drifting gradient wash for depth behind the dashes. Kept gentle
-          since it now sits behind every section, not just the hero. */}
-      <div className="absolute inset-0 animate-gradient-drift bg-[radial-gradient(55%_50%_at_15%_15%,rgba(37,99,235,0.12),transparent),radial-gradient(50%_50%_at_85%_25%,rgba(124,58,237,0.10),transparent),radial-gradient(45%_45%_at_60%_85%,rgba(6,182,212,0.08),transparent)]" />
-
-      {/* The interactive dash field: whole viewport, fixed behind all content. */}
-      <canvas ref={canvasRef} className="absolute inset-0" />
+    <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(58%_48%_at_14%_12%,rgba(37,99,235,0.11),transparent_62%),radial-gradient(52%_50%_at_86%_20%,rgba(124,58,237,0.09),transparent_62%),radial-gradient(50%_46%_at_62%_92%,rgba(6,182,212,0.07),transparent_60%)]" />
+      <canvas ref={ref} className="absolute inset-0" />
     </div>
   );
 }

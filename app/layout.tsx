@@ -5,7 +5,6 @@ import type { Metadata, Viewport } from "next";
 import "@fontsource-variable/space-grotesk";
 import "@fontsource-variable/inter";
 import "@fontsource-variable/jetbrains-mono";
-import { ThemeProvider } from "@/components/theme-provider";
 import { ScrollProgress } from "@/components/scroll-progress";
 import { Nav } from "@/components/nav";
 import { AmbientBackground } from "@/components/ambient-background";
@@ -102,17 +101,13 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <AmbientBackground />
-          <ScrollProgress />
-          <Nav />
-          {children}
-        </ThemeProvider>
+        <AmbientBackground
+          accent={siteConfig.accent}
+          enabled={siteConfig.ambientField}
+        />
+        <ScrollProgress />
+        <Nav />
+        {children}
       </body>
     </html>
   );
