@@ -4,6 +4,11 @@
 
 @layer base {
   :root {
+    /* Font families (self-hosted via Fontsource; see app/layout.tsx). */
+    --font-display: "Space Grotesk Variable";
+    --font-sans: "Inter Variable";
+    --font-mono: "JetBrains Mono Variable";
+
     /* Dark is the primary identity (OpenAI/Linear/Vercel register). */
     --bg: 222 47% 7%; /* #0F172A-ish */
     --surface: 222 40% 10%;

@@ -1,5 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import { Space_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
+// Fonts are self-hosted via Fontsource (installed from npm), so the build never
+// reaches Google Fonts. Family names: "Space Grotesk Variable", "Inter
+// Variable", "JetBrains Mono Variable" (wired to CSS vars in globals.css).
+import "@fontsource-variable/space-grotesk";
+import "@fontsource-variable/inter";
+import "@fontsource-variable/jetbrains-mono";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ScrollProgress } from "@/components/scroll-progress";
 import { Nav } from "@/components/nav";
@@ -7,22 +12,6 @@ import { AmbientBackground } from "@/components/ambient-background";
 import { identity, about, contact } from "@/lib/data";
 import { siteConfig } from "@/lib/config";
 import "./globals.css";
-
-const display = Space_Grotesk({
-  subsets: ["latin"],
-  variable: "--font-display",
-  display: "swap",
-});
-const sans = Inter({
-  subsets: ["latin"],
-  variable: "--font-sans",
-  display: "swap",
-});
-const mono = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
-  display: "swap",
-});
 
 // Set NEXT_PUBLIC_SITE_URL in your environment (used for OG/canonical/JSON-LD).
 const SITE_URL = siteConfig.siteUrl;
@@ -107,11 +96,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html
-      lang="en"
-      suppressHydrationWarning
-      className={`${display.variable} ${sans.variable} ${mono.variable}`}
-    >
+    <html lang="en" suppressHydrationWarning>
       <body>
         <script
           type="application/ld+json"
