@@ -27,15 +27,14 @@ export function TechStack() {
 
       <div className="space-y-4 [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
         {rows.map((row, r) => (
-          <div key={r} className="group flex overflow-hidden">
+          <div key={r} className="tech-marquee-row flex overflow-hidden">
             {/* Duplicate the row twice for a seamless loop. */}
             {[0, 1].map((dup) => (
               <div
                 key={dup}
-                className="flex shrink-0 items-center gap-3 pr-3"
-                style={{
-                  animation: `marquee-${r % 2 === 0 ? "l" : "r"} 40s linear infinite`,
-                }}
+                className={`flex shrink-0 items-center gap-3 pr-3 ${
+                  r % 2 === 0 ? "marquee-l" : "marquee-r"
+                }`}
               >
                 {row.map((t) => (
                   <Badge
@@ -50,18 +49,6 @@ export function TechStack() {
           </div>
         ))}
       </div>
-
-      <style>{`
-        @keyframes marquee-l {
-          from { transform: translateX(0); }
-          to { transform: translateX(-100%); }
-        }
-        @keyframes marquee-r {
-          from { transform: translateX(-100%); }
-          to { transform: translateX(0); }
-        }
-        .group:hover > div { animation-play-state: paused; }
-      `}</style>
     </section>
   );
 }

@@ -80,6 +80,36 @@
     animation: pb-travel 3.5s linear infinite;
   }
 
+  /* Tech-stack marquee (moved out of an inline <style> to avoid a hydration
+     mismatch: React escaped the ">" child combinator differently on server vs
+     client). Animation lives on classes so the hover-pause rule can win. */
+  @keyframes marquee-l {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-100%);
+    }
+  }
+  @keyframes marquee-r {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+  .marquee-l {
+    animation: marquee-l 40s linear infinite;
+  }
+  .marquee-r {
+    animation: marquee-r 40s linear infinite;
+  }
+  .tech-marquee-row:hover .marquee-l,
+  .tech-marquee-row:hover .marquee-r {
+    animation-play-state: paused;
+  }
+
   /* Dotted gradient divider, the line-shaped sibling of the particle border. */
   .dot-divider {
     height: 1.5px;
