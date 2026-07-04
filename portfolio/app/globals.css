@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Dark is the primary identity (OpenAI/Linear/Vercel register). */
+    --bg: 222 47% 7%; /* #0F172A-ish */
+    --surface: 222 40% 10%;
+    --elevated: 222 33% 14%;
+    --border: 222 25% 20%;
+    --fg: 210 40% 98%; /* #F8FAFC */
+    --muted: 215 20% 65%;
+  }
+
+  .light {
+    --bg: 210 40% 98%; /* #F8FAFC */
+    --surface: 0 0% 100%;
+    --elevated: 210 40% 96%;
+    --border: 214 32% 88%;
+    --fg: 222 47% 11%; /* #0F172A */
+    --muted: 215 16% 42%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem; /* offset for fixed nav */
+  }
+
+  body {
+    @apply bg-bg text-fg font-sans antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  ::selection {
+    @apply bg-accent/30 text-fg;
+  }
+
+  /* Slim, on-brand scrollbar. */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-border;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted;
+  }
+}
+
+@layer components {
+  /* The brand gradient text treatment, used sparingly on key words. */
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent;
+  }
+
+  /* Glassmorphism card surface. */
+  .glass {
+    @apply border border-white/10 bg-white/[0.03] backdrop-blur-xl;
+  }
+  .light .glass {
+    @apply border-black/5 bg-white/70;
+  }
+
+  /* Gradient-border wrapper (uses a masked pseudo-element). */
+  .gradient-border {
+    position: relative;
+    isolation: isolate;
+  }
+  .gradient-border::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      135deg,
+      #2563eb,
+      #06b6d4 45%,
+      #7c3aed
+    );
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0.5;
+    transition: opacity 0.3s ease;
+    z-index: -1;
+  }
+  .gradient-border:hover::before {
+    opacity: 1;
+  }
+
+  .section-eyebrow {
+    @apply mb-3 inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.25em] text-secondary;
+  }
+}
+
+/* Respect users who prefer reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

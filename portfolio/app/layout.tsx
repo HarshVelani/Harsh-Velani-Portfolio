@@ -1,0 +1,131 @@
+import type { Metadata, Viewport } from "next";
+import { Space_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
+import { ThemeProvider } from "@/components/theme-provider";
+import { ScrollProgress } from "@/components/scroll-progress";
+import { Nav } from "@/components/nav";
+import { identity, about, contact } from "@/lib/data";
+import "./globals.css";
+
+const display = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-display",
+  display: "swap",
+});
+const sans = Inter({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+});
+const mono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  display: "swap",
+});
+
+// ⚠️ Set this to your deployed URL before shipping (used for OG/canonical).
+const SITE_URL = "https://your-domain.vercel.app";
+
+export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: `${identity.name} — AI/ML Engineer & Data Scientist`,
+    template: `%s · ${identity.name}`,
+  },
+  description: about.shortBio,
+  keywords: [
+    "AI Engineer",
+    "Machine Learning Engineer",
+    "Data Scientist",
+    "Agentic AI",
+    "LangGraph",
+    "RAG",
+    "LLM Fine-Tuning",
+    "Generative AI",
+    identity.name,
+  ],
+  authors: [{ name: identity.name }],
+  creator: identity.name,
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    url: SITE_URL,
+    title: `${identity.name} — AI/ML Engineer & Data Scientist`,
+    description: about.shortBio,
+    siteName: `${identity.name} Portfolio`,
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: identity.name }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${identity.name} — AI/ML Engineer`,
+    description: about.shortBio,
+    images: ["/og-image.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large" },
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#0F172A" },
+    { media: "(prefers-color-scheme: light)", color: "#F8FAFC" },
+  ],
+};
+
+// Schema.org Person markup for rich results.
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: identity.name,
+  jobTitle: "AI/ML Engineer & Data Scientist",
+  description: about.shortBio,
+  url: SITE_URL,
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "Ahmedabad",
+    addressRegion: "Gujarat",
+    addressCountry: "IN",
+  },
+  sameAs: [contact.github, contact.linkedin],
+  knowsAbout: [
+    "Generative AI",
+    "Agentic AI",
+    "Retrieval-Augmented Generation",
+    "LLM Fine-Tuning",
+    "Computer Vision",
+    "Natural Language Processing",
+  ],
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${display.variable} ${sans.variable} ${mono.variable}`}
+    >
+      <body>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <ScrollProgress />
+          <Nav />
+          {children}
+        </ThemeProvider>
+      </body>
+    </html>
+  );
+}
