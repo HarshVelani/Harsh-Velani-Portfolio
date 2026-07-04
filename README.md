@@ -2,7 +2,7 @@
 
 Premium personal portfolio for an AI/ML Engineer & Data Scientist. Built with the App Router, TypeScript, Tailwind, and Framer Motion. Dark-first, fully responsive, WCAG-minded, and tuned for a Lighthouse score above 95.
 
-The signature element is a calm ambient "vector field" in the hero: a sparse drift of small dashes evoking points in an embedding space, a nod to the vector databases at the core of the stack.
+The signature element is a calm, interactive "vector field" behind the whole page: a sparse drift of small dashes evoking points in an embedding space (a nod to the vector databases at the core of the stack). Dashes near the cursor push away, orient around it, and brighten, then ease back.
 
 ## Stack
 
@@ -63,14 +63,27 @@ Optional: add `public/og-image.png` (1200x630) for social previews. A local
 
 ### Contact form
 
-The form submits through Web3Forms, a hosted form service, so there is no
-backend of your own to run. The browser posts directly to their API with a
-public access key. To enable it, get a free key at https://web3forms.com (enter
-your email, no password) and set `NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY`. The free
-tier covers 250 submissions per month, which is far more than a portfolio needs.
-Submissions arrive in your email. The form shows sending, success, and error
-states, and includes a honeypot to deter spam. If the key is missing, the form
-shows a friendly "not configured" message instead of failing silently.
+The form submits through Web3Forms (a hosted form service), so there is no
+backend of your own. The browser posts directly to their API with a public
+access key, and **if Web3Forms is unavailable for any reason, the form falls
+back to opening the visitor's mail app with the message prefilled** (the
+original behaviour). Failures that trigger the fallback include: the key not
+being set, a network error, the API being down, an invalid key, or a blocked
+domain. On a real send it shows sending and success states; on fallback it
+opens the mail app and also shows your address as a safety net.
+
+Setup:
+
+1. Go to https://web3forms.com and create a form. Give it any name; for
+   **Domain name** type `localhost` for testing, and add your real domain for
+   production (comma-separated, no `https://`), e.g. `localhost, harshvelani.com`.
+2. The access key is emailed to you (also in the dashboard). Put it in
+   `NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY`.
+
+Note: Web3Forms' free plan blocks some free subdomains (e.g. `*.vercel.app`), so
+on a free Vercel URL submissions may not go through and the mail-app fallback
+will take over. Use a custom domain to avoid this. The Web3Forms API must run
+client-side (which it does here); server-side use needs a paid plan.
 
 ## Project structure
 

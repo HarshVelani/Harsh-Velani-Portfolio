@@ -3,12 +3,13 @@
 import { useEffect, useRef } from "react";
 
 /**
- * AmbientBackground - the hero's signature atmosphere.
+ * AmbientBackground - a site-wide ambient atmosphere.
  *
  * A sparse field of small drifting dashes, evoking points in an embedding /
  * latent space (a nod to the vector databases at the core of the stack).
- * Inspired by Google Antigravity's landing field, tuned down: low density,
- * slow drift, no connecting lines.
+ * Rendered once in the root layout as a fixed, viewport-sized layer behind all
+ * content, so the field sits behind every section as you scroll. Because it is
+ * fixed to the viewport (not the full document), it stays cheap.
  *
  * Cursor interaction: dashes within a radius of the pointer are pushed
  * outward, rotate to orient around it (like iron filings around a magnet),
@@ -263,16 +264,14 @@ export function AmbientBackground() {
   return (
     <div
       aria-hidden
-      className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
+      className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
     >
-      {/* Soft drifting gradient wash for depth behind the dashes. */}
-      <div className="absolute inset-0 animate-gradient-drift bg-[radial-gradient(60%_50%_at_20%_20%,rgba(37,99,235,0.16),transparent),radial-gradient(50%_50%_at_80%_30%,rgba(124,58,237,0.14),transparent),radial-gradient(45%_45%_at_60%_80%,rgba(6,182,212,0.10),transparent)]" />
+      {/* Soft drifting gradient wash for depth behind the dashes. Kept gentle
+          since it now sits behind every section, not just the hero. */}
+      <div className="absolute inset-0 animate-gradient-drift bg-[radial-gradient(55%_50%_at_15%_15%,rgba(37,99,235,0.12),transparent),radial-gradient(50%_50%_at_85%_25%,rgba(124,58,237,0.10),transparent),radial-gradient(45%_45%_at_60%_85%,rgba(6,182,212,0.08),transparent)]" />
 
-      {/* The interactive dash field. */}
+      {/* The interactive dash field: whole viewport, fixed behind all content. */}
       <canvas ref={canvasRef} className="absolute inset-0" />
-
-      {/* Fade the field into the page so text stays readable. */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-bg/30 to-bg" />
     </div>
   );
 }

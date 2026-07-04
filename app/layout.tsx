@@ -3,7 +3,9 @@ import { Space_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ScrollProgress } from "@/components/scroll-progress";
 import { Nav } from "@/components/nav";
+import { AmbientBackground } from "@/components/ambient-background";
 import { identity, about, contact } from "@/lib/data";
+import { siteConfig } from "@/lib/config";
 import "./globals.css";
 
 const display = Space_Grotesk({
@@ -22,8 +24,8 @@ const mono = JetBrains_Mono({
   display: "swap",
 });
 
-// ⚠️ Set this to your deployed URL before shipping (used for OG/canonical).
-const SITE_URL = "https://your-domain.vercel.app";
+// Set NEXT_PUBLIC_SITE_URL in your environment (used for OG/canonical/JSON-LD).
+const SITE_URL = siteConfig.siteUrl;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -121,6 +123,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <AmbientBackground />
           <ScrollProgress />
           <Nav />
           {children}

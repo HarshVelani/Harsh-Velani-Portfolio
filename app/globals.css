@@ -62,42 +62,39 @@
     @apply bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent;
   }
 
-  /* Glassmorphism card surface. */
+  /* Glass surface (fill + blur only; the edge is the ParticleBorder). */
   .glass {
-    @apply border border-white/10 bg-white/[0.03] backdrop-blur-xl;
+    @apply bg-white/[0.03] backdrop-blur-xl;
   }
   .light .glass {
-    @apply border-black/5 bg-white/70;
+    @apply bg-white/70;
   }
 
-  /* Gradient-border wrapper (uses a masked pseudo-element). */
-  .gradient-border {
-    position: relative;
-    isolation: isolate;
+  /* Traveling dots for ParticleBorder (frozen under reduced-motion below). */
+  @keyframes pb-travel {
+    to {
+      stroke-dashoffset: -7.5;
+    }
   }
-  .gradient-border::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    padding: 1px;
-    background: linear-gradient(
-      135deg,
-      #2563eb,
-      #06b6d4 45%,
-      #7c3aed
+  .pb-dot {
+    animation: pb-travel 3.5s linear infinite;
+  }
+
+  /* Dotted gradient divider, the line-shaped sibling of the particle border. */
+  .dot-divider {
+    height: 1.5px;
+    background-image: linear-gradient(90deg, #2563eb, #06b6d4, #7c3aed);
+    -webkit-mask-image: repeating-linear-gradient(
+      90deg,
+      #000 0 2px,
+      transparent 2px 9px
     );
-    -webkit-mask:
-      linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    opacity: 0.5;
-    transition: opacity 0.3s ease;
-    z-index: -1;
-  }
-  .gradient-border:hover::before {
-    opacity: 1;
+    mask-image: repeating-linear-gradient(
+      90deg,
+      #000 0 2px,
+      transparent 2px 9px
+    );
+    opacity: 0.45;
   }
 
   .section-eyebrow {

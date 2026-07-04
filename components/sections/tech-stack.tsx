@@ -12,7 +12,9 @@ export function TechStack() {
   const rows = [techStack.slice(0, half), techStack.slice(half)];
 
   return (
-    <section className="border-y border-border py-14">
+    <section className="relative py-14">
+      <div className="dot-divider absolute inset-x-0 top-0" />
+      <div className="dot-divider absolute inset-x-0 bottom-0" />
       <div className="container mb-8">
         <span className="section-eyebrow">
           <span className="h-px w-6 bg-secondary" />

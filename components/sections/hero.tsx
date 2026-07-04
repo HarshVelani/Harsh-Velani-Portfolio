@@ -8,7 +8,6 @@ import {
   Linkedin,
   MapPin,
 } from "lucide-react";
-import { AmbientBackground } from "@/components/ambient-background";
 import { TypingHeadline } from "@/components/typing-headline";
 import { Button } from "@/components/ui/button";
 import { identity, contact, about } from "@/lib/data";
@@ -34,7 +33,6 @@ export function Hero() {
       id="top"
       className="relative flex min-h-screen items-center overflow-hidden pt-24"
     >
-      <AmbientBackground />
 
       <div className="container">
         <motion.div

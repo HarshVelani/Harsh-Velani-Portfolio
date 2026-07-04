@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 
 export function Footer() {
   return (
-    <footer className="border-t border-border py-12">
+    <footer className="relative py-12">
+      <div className="dot-divider absolute inset-x-0 top-0" />
       <div className="container">
         <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
           {/* Brand */}

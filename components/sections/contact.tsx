@@ -11,7 +11,6 @@ import {
   Send,
   Loader2,
   CheckCircle2,
-  AlertCircle,
 } from "lucide-react";
 import { Section } from "@/components/section";
 import { Card } from "@/components/ui/card";
@@ -49,26 +48,39 @@ export function Contact() {
   const [email, setEmail] = React.useState("");
   const [message, setMessage] = React.useState("");
   const [status, setStatus] = React.useState<
-    "idle" | "sending" | "success" | "error"
+    "idle" | "sending" | "success" | "fallback"
   >("idle");
-  const [errorMsg, setErrorMsg] = React.useState("");
   const botRef = React.useRef<HTMLInputElement>(null); // honeypot
 
-  // Client-side submit to Web3Forms. No backend of our own: the browser posts
-  // straight to their API with a public access key.
+  // Fallback: open the visitor's mail app with the message prefilled. This is
+  // the original behaviour, used whenever Web3Forms is unavailable.
+  const openMailApp = () => {
+    const subject = encodeURIComponent(
+      `Portfolio message from ${name || "a visitor"}`
+    );
+    const body = encodeURIComponent(
+      `${message}\n\n— ${name}${email ? ` (${email})` : ""}`
+    );
+    window.location.href = `mailto:${contact.email}?subject=${subject}&body=${body}`;
+  };
+
+  // Primary path: submit to Web3Forms (client-side). If it is not configured or
+  // fails for any reason (network down, bad key, blocked domain, API error),
+  // fall back to opening the mail app with the details prefilled.
   const send = async () => {
     if (!message.trim() || status === "sending") return;
 
-    if (!siteConfig.web3formsKey) {
-      setStatus("error");
-      setErrorMsg(
-        "Contact form is not configured yet. Set NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY."
-      );
+    const key = siteConfig.web3formsKey;
+    const configured = key && key !== "your-web3forms-access-key";
+
+    // Web3Forms not set up yet -> straight to the email-app fallback.
+    if (!configured) {
+      openMailApp();
+      setStatus("fallback");
       return;
     }
 
     setStatus("sending");
-    setErrorMsg("");
 
     try {
       const res = await fetch("https://api.web3forms.com/submit", {
@@ -78,7 +90,7 @@ export function Contact() {
           Accept: "application/json",
         },
         body: JSON.stringify({
-          access_key: siteConfig.web3formsKey,
+          access_key: key,
           subject: `Portfolio message from ${name || "a visitor"}`,
           from_name: name || "Portfolio visitor",
           name,
@@ -96,12 +108,14 @@ export function Contact() {
         setEmail("");
         setMessage("");
       } else {
-        setStatus("error");
-        setErrorMsg(data.message || "Something went wrong. Please try again.");
+        // Reachable but rejected (bad key, blocked domain, spam) -> fallback.
+        openMailApp();
+        setStatus("fallback");
       }
     } catch {
-      setStatus("error");
-      setErrorMsg("Network error. Please try again, or email me directly.");
+      // Network error or API down -> fallback. Keep the typed text intact.
+      openMailApp();
+      setStatus("fallback");
     }
   };
 
@@ -240,9 +254,17 @@ export function Contact() {
                   back to you.
                 </span>
               )}
-              {status === "error" && (
-                <span className="inline-flex items-center gap-1.5 text-sm text-red-400">
-                  <AlertCircle className="h-4 w-4" /> {errorMsg}
+              {status === "fallback" && (
+                <span className="inline-flex items-center gap-1.5 text-sm text-muted">
+                  <Mail className="h-4 w-4" /> Opening your email app. If nothing
+                  opens, email me at{" "}
+                  <a
+                    href={`mailto:${contact.email}`}
+                    className="text-secondary underline underline-offset-2"
+                  >
+                    {contact.email}
+                  </a>
+                  .
                 </span>
               )}
             </div>
