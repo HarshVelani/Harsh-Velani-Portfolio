@@ -5,18 +5,20 @@ import type {
   Project,
   SkillGroup,
 } from "@/types";
+import { siteConfig } from "@/lib/config";
 
 /* ============================================================================
- * CONTACT  —  ⚠️  EDIT THESE THREE VALUES  ⚠️
- * Replace the TODO strings with your real links. Nothing else needs touching
- * to go live. The resume path points at /public/resume.pdf (drop your PDF in).
+ * CONTACT
+ * All values come from environment variables via lib/config.ts.
+ * Do NOT edit these here: set them in .env.local (see .env.example).
  * ========================================================================== */
 export const contact: Contact = {
-  email: "TODO_your_email@example.com", // ← replace
-  linkedin: "https://www.linkedin.com/in/TODO", // ← replace
-  github: "https://github.com/TODO", // ← replace
-  location: "Ahmedabad, Gujarat, India",
-  resume: "/resume.pdf", // ← drop your PDF at public/resume.pdf
+  email: siteConfig.email,
+  phone: siteConfig.phone,
+  linkedin: siteConfig.linkedin,
+  github: siteConfig.github,
+  location: siteConfig.location,
+  resume: siteConfig.resumeUrl,
 };
 
 export const identity = {

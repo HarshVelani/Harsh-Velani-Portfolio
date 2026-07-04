@@ -54,8 +54,9 @@ export function Nav() {
           <ThemeToggle />
           <a
             href={contact.resume}
+            target="_blank"
+            rel="noopener noreferrer"
             className="hidden md:block"
-            download
           >
             <Button size="sm">Resume</Button>
           </a>
@@ -92,7 +93,12 @@ export function Nav() {
                 </li>
               ))}
               <li className="pt-2">
-                <a href={contact.resume} download onClick={() => setOpen(false)}>
+                <a
+                  href={contact.resume}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setOpen(false)}
+                >
                   <Button className="w-full">Download Resume</Button>
                 </a>
               </li>

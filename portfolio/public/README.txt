@@ -1,9 +1,9 @@
-Drop these two files here before deploying:
+Optional assets:
 
-1. resume.pdf   — your résumé. The "Resume" / "Download" buttons link to /resume.pdf.
-2. og-image.png — 1200×630 social preview image (shown when the link is shared
-                  on LinkedIn / X / Slack). Until you add it, social cards will
-                  show a broken image but the site works fine.
+1. og-image.png  - 1200x630 social preview image (shown when the link is shared
+                   on LinkedIn / X / Slack). Set NEXT_PUBLIC_SITE_URL too.
+2. resume.pdf    - only if you set NEXT_PUBLIC_RESUME_URL=/resume.pdf instead of
+                   a Google Drive link. Otherwise the resume opens from Drive.
 
-Optional: favicon.ico, apple-touch-icon.png, and a /public/images folder if you
-add project screenshots later (referenced from lib/data.ts).
+Contact details, LinkedIn/GitHub, the resume link, location and site URL are all
+configured via environment variables, not files here. See .env.example.

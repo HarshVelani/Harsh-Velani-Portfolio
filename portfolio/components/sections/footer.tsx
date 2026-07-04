@@ -72,7 +72,12 @@ export function Footer() {
                 </Button>
               </a>
             </div>
-            <a href={contact.resume} download className="mt-4 inline-block">
+            <a
+              href={contact.resume}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 inline-block"
+            >
               <Button variant="outline" size="sm">
                 Download Résumé
               </Button>
@@ -82,8 +87,11 @@ export function Footer() {
 
         <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-border pt-6 sm:flex-row">
           <p className="text-xs text-muted">
-            © {new Date().getFullYear()} {identity.name}. Built with Next.js &
-            Tailwind CSS.
+            {/* Year is intentionally client-current; isolating it in a
+                suppressHydrationWarning span lets the build-time and runtime
+                years differ (e.g. across New Year) without a hydration error. */}
+            © <span suppressHydrationWarning>{new Date().getFullYear()}</span>{" "}
+            {identity.name}. Built with Next.js & Tailwind CSS.
           </p>
           <a href="#top">
             <Button variant="ghost" size="sm">

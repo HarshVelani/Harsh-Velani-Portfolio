@@ -2,7 +2,7 @@
 
 Premium personal portfolio for an AI/ML Engineer & Data Scientist. Built with the App Router, TypeScript, Tailwind, and Framer Motion. Dark-first, fully responsive, WCAG-minded, and tuned for a Lighthouse score above 95.
 
-The signature element is an animated **agent-graph** motif in the hero — nodes and pulsing edges that echo the LangGraph / multi-agent orchestration the work is built on.
+The signature element is a calm ambient "vector field" in the hero: a sparse drift of small dashes evoking points in an embedding space, a nod to the vector databases at the core of the stack.
 
 ## Stack
 
@@ -12,7 +12,7 @@ The signature element is an animated **agent-graph** motif in the hero — nodes
 - **next-themes** for the theme toggle · **lucide-react** for icons
 - shadcn-style primitives (`Button`, `Card`, `Badge`) hand-written with `cva` — no CLI init needed
 
-No GSAP, no Three.js: the animated background is CSS/SVG, which keeps the bundle small and performance high.
+No GSAP, no Three.js. The ambient background is a lightweight canvas particle field (capped density, pauses when the tab is hidden), which keeps the bundle small and performance high.
 
 ## Quick start
 
@@ -28,13 +28,49 @@ npm start          # serve the build locally
 
 Requires Node 18.17+.
 
-## Make it yours (3 edits)
+## Make it yours (env only)
 
-1. **`lib/data.ts`** — top of the file, the `contact` object. Replace the three `TODO` values (email, LinkedIn, GitHub). All site content lives in this one file if you ever want to tweak copy.
-2. **`public/resume.pdf`** — drop your résumé in. The Resume buttons link here.
-3. **`app/layout.tsx`** — set `SITE_URL` to your live URL (used for canonical + Open Graph), and add `public/og-image.png` (1200×630) for social previews.
+All personal details live in environment variables. No source edits needed.
 
-That's it — nothing else is required to go live.
+```bash
+cp .env.example .env.local   # then fill in your values
+```
+
+`.env.local` keys (all must keep the `NEXT_PUBLIC_` prefix so they reach the browser):
+
+| Key | What it sets |
+| --- | --- |
+| `NEXT_PUBLIC_EMAIL` | Contact email (mailto + form target) |
+| `NEXT_PUBLIC_PHONE` | Optional phone; leave blank to hide it |
+| `NEXT_PUBLIC_LINKEDIN` | LinkedIn profile URL |
+| `NEXT_PUBLIC_GITHUB` | GitHub profile URL |
+| `NEXT_PUBLIC_RESUME_URL` | Google Drive resume link (opens in a new tab) |
+| `NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY` | Web3Forms key for the contact form (free) |
+| `NEXT_PUBLIC_LOCATION` | Location shown in hero + contact |
+| `NEXT_PUBLIC_SITE_URL` | Deployed URL for canonical / Open Graph / JSON-LD |
+
+Resume link: paste your Drive share URL. For a direct download rather than the
+Drive preview, use the `https://drive.google.com/uc?export=download&id=FILE_ID`
+form (see `.env.example`).
+
+On Vercel/Netlify, set these same keys in the project's Environment Variables
+dashboard rather than committing `.env.local`. Because `NEXT_PUBLIC_` values are
+inlined at build time, redeploy after changing them.
+
+Optional: add `public/og-image.png` (1200x630) for social previews. A local
+`public/resume.pdf` still works if you prefer it over Drive: set
+`NEXT_PUBLIC_RESUME_URL=/resume.pdf`.
+
+### Contact form
+
+The form submits through Web3Forms, a hosted form service, so there is no
+backend of your own to run. The browser posts directly to their API with a
+public access key. To enable it, get a free key at https://web3forms.com (enter
+your email, no password) and set `NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY`. The free
+tier covers 250 submissions per month, which is far more than a portfolio needs.
+Submissions arrive in your email. The form shows sending, success, and error
+states, and includes a honeypot to deter spam. If the key is missing, the form
+shows a friendly "not configured" message instead of failing silently.
 
 ## Project structure
 
@@ -45,7 +81,7 @@ app/
   globals.css       # theme variables + base styles
 components/
   nav.tsx           # sticky responsive nav + mobile drawer
-  agent-graph-bg.tsx# signature animated background
+  ambient-background.tsx # canvas vector-field background
   typing-headline.tsx
   scroll-progress.tsx
   section.tsx       # shared section wrapper w/ scroll reveal

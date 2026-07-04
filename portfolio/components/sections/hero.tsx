@@ -8,7 +8,7 @@ import {
   Linkedin,
   MapPin,
 } from "lucide-react";
-import { AgentGraphBackground } from "@/components/agent-graph-bg";
+import { AmbientBackground } from "@/components/ambient-background";
 import { TypingHeadline } from "@/components/typing-headline";
 import { Button } from "@/components/ui/button";
 import { identity, contact, about } from "@/lib/data";
@@ -34,7 +34,7 @@ export function Hero() {
       id="top"
       className="relative flex min-h-screen items-center overflow-hidden pt-24"
     >
-      <AgentGraphBackground />
+      <AmbientBackground />
 
       <div className="container">
         <motion.div
@@ -83,7 +83,7 @@ export function Hero() {
                 View Projects <ArrowUpRight className="h-4 w-4" />
               </Button>
             </a>
-            <a href={contact.resume} download>
+            <a href={contact.resume} target="_blank" rel="noopener noreferrer">
               <Button variant="outline">
                 <Download className="h-4 w-4" /> Resume
               </Button>

@@ -13,12 +13,19 @@ export function ThemeToggle() {
   React.useEffect(() => setMounted(true), []);
 
   const isDark = resolvedTheme === "dark";
+  // Keep the label stable until mounted so SSR and the first client render
+  // agree (resolvedTheme is undefined on the server).
+  const label = !mounted
+    ? "Toggle theme"
+    : isDark
+      ? "Switch to light mode"
+      : "Switch to dark mode";
 
   return (
     <Button
       variant="ghost"
       size="icon"
-      aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      aria-label={label}
       onClick={() => setTheme(isDark ? "light" : "dark")}
     >
       {mounted && isDark ? (

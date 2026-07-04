@@ -2,14 +2,43 @@
 
 import * as React from "react";
 import { motion } from "framer-motion";
-import { Mail, Github, Linkedin, MapPin, Send } from "lucide-react";
+import {
+  Mail,
+  Github,
+  Linkedin,
+  MapPin,
+  Phone,
+  Send,
+  Loader2,
+  CheckCircle2,
+  AlertCircle,
+} from "lucide-react";
 import { Section } from "@/components/section";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { contact } from "@/lib/data";
+import { siteConfig } from "@/lib/config";
 
-const channels = [
+type Channel = {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  value: string;
+  href?: string;
+};
+
+// Phone is included only when NEXT_PUBLIC_PHONE is set.
+const channels: Channel[] = [
   { icon: Mail, label: "Email", value: contact.email, href: `mailto:${contact.email}` },
+  ...(contact.phone
+    ? [
+        {
+          icon: Phone,
+          label: "Phone",
+          value: contact.phone,
+          href: `tel:${contact.phone.replace(/\s+/g, "")}`,
+        } as Channel,
+      ]
+    : []),
   { icon: Linkedin, label: "LinkedIn", value: "Connect", href: contact.linkedin },
   { icon: Github, label: "GitHub", value: "Follow", href: contact.github },
   { icon: MapPin, label: "Location", value: contact.location, href: undefined },
@@ -19,14 +48,61 @@ export function Contact() {
   const [name, setName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [message, setMessage] = React.useState("");
+  const [status, setStatus] = React.useState<
+    "idle" | "sending" | "success" | "error"
+  >("idle");
+  const [errorMsg, setErrorMsg] = React.useState("");
+  const botRef = React.useRef<HTMLInputElement>(null); // honeypot
 
-  // No backend required: build a prefilled mailto and let the OS mail client send.
-  const send = () => {
-    const subject = encodeURIComponent(`Portfolio contact from ${name || "someone"}`);
-    const body = encodeURIComponent(
-      `${message}\n\n— ${name}${email ? ` (${email})` : ""}`
-    );
-    window.location.href = `mailto:${contact.email}?subject=${subject}&body=${body}`;
+  // Client-side submit to Web3Forms. No backend of our own: the browser posts
+  // straight to their API with a public access key.
+  const send = async () => {
+    if (!message.trim() || status === "sending") return;
+
+    if (!siteConfig.web3formsKey) {
+      setStatus("error");
+      setErrorMsg(
+        "Contact form is not configured yet. Set NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY."
+      );
+      return;
+    }
+
+    setStatus("sending");
+    setErrorMsg("");
+
+    try {
+      const res = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          access_key: siteConfig.web3formsKey,
+          subject: `Portfolio message from ${name || "a visitor"}`,
+          from_name: name || "Portfolio visitor",
+          name,
+          email,
+          message,
+          // Honeypot: real users leave this unchecked; bots that tick it are rejected.
+          botcheck: botRef.current?.checked ?? false,
+        }),
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        setStatus("success");
+        setName("");
+        setEmail("");
+        setMessage("");
+      } else {
+        setStatus("error");
+        setErrorMsg(data.message || "Something went wrong. Please try again.");
+      }
+    } catch {
+      setStatus("error");
+      setErrorMsg("Network error. Please try again, or email me directly.");
+    }
   };
 
   const inputCls =
@@ -130,11 +206,49 @@ export function Contact() {
                 className={`${inputCls} resize-none`}
               />
             </div>
-            <Button onClick={send} disabled={!message} className="w-full sm:w-auto">
-              Send message <Send className="h-4 w-4" />
-            </Button>
+            {/* Honeypot: hidden from people, catches bots that tick it. */}
+            <input
+              ref={botRef}
+              type="checkbox"
+              name="botcheck"
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden
+              className="sr-only"
+            />
+
+            <div className="flex flex-wrap items-center gap-3">
+              <Button
+                onClick={send}
+                disabled={!message.trim() || status === "sending"}
+                className="w-full sm:w-auto"
+              >
+                {status === "sending" ? (
+                  <>
+                    Sending <Loader2 className="h-4 w-4 animate-spin" />
+                  </>
+                ) : (
+                  <>
+                    Send message <Send className="h-4 w-4" />
+                  </>
+                )}
+              </Button>
+
+              {status === "success" && (
+                <span className="inline-flex items-center gap-1.5 text-sm text-secondary">
+                  <CheckCircle2 className="h-4 w-4" /> Message sent. I will get
+                  back to you.
+                </span>
+              )}
+              {status === "error" && (
+                <span className="inline-flex items-center gap-1.5 text-sm text-red-400">
+                  <AlertCircle className="h-4 w-4" /> {errorMsg}
+                </span>
+              )}
+            </div>
+
             <p className="text-xs text-muted">
-              Opens your mail app with the message ready to send.
+              Your message goes straight to my inbox.
             </p>
           </Card>
         </motion.div>
