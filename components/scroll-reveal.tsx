@@ -4,7 +4,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import type { ReactNode } from "react";
 
 /**
- * ScrollReveal — wrap any block to fade + rise it into view on scroll.
+ * ScrollReveal - wrap any block to fade + rise it into view on scroll.
  * Uses Framer Motion's whileInView (no manual IntersectionObserver). Content
  * is never stranded hidden: under prefers-reduced-motion it renders visible
  * with no animation.

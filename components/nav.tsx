@@ -9,7 +9,7 @@ import { navLinks, identity, contact } from "@/lib/data";
  * Nav + left section-progress rail.
  *
  * - Desktop links / hamburger visibility is driven by Tailwind breakpoints
- *   (md:) — CSS media queries, NOT JS width reads (that race was a real bug).
+ *   (md:) - CSS media queries, NOT JS width reads (that race was a real bug).
  * - Glass-on-scroll via a scroll listener (a visual effect, fine in JS).
  * - The fixed left rail (vertical 01–NN) appears only >=1320px so it never
  *   overlaps the centered 1200px content.

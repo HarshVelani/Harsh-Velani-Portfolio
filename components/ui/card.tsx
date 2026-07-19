@@ -2,7 +2,7 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * Card — Latent Space surface: subtle fill + 1px hairline, 20px radius, blur.
+ * Card - Latent Space surface: subtle fill + 1px hairline, 20px radius, blur.
  * Hover: lift 5px, cyan border, soft cyan shadow.
  */
 const Card = React.forwardRef<

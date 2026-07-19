@@ -34,10 +34,8 @@ export const siteConfig = {
   // --- Design toggles (mirror the redesign props) ---
   // Signature accent (cyan). Falls back to the same value in CSS.
   accent: process.env.NEXT_PUBLIC_ACCENT ?? "#06B6D4",
-  // Show the 3D "vector database" ambient canvas behind everything.
+  // Show the page-wide ambient neural field.
   ambientField: (process.env.NEXT_PUBLIC_AMBIENT_FIELD ?? "true") !== "false",
-  // Show the agent-graph terminal panel in the hero's right column.
-  showAgentGraph: (process.env.NEXT_PUBLIC_SHOW_AGENT_GRAPH ?? "true") !== "false",
 } as const;
 
 export type SiteConfig = typeof siteConfig;

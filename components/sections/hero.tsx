@@ -1,45 +1,17 @@
 "use client";
 
-import * as React from "react";
 import { motion } from "framer-motion";
 import { ArrowUpRight, Download, Github, Linkedin, MapPin } from "lucide-react";
 import { TypingHeadline } from "@/components/typing-headline";
 import { Button } from "@/components/ui/button";
+import { LiveAgentRun } from "@/components/live-agent-run";
+import { VectorSearch } from "@/components/vector-search";
 import { identity, contact } from "@/lib/data";
-import { siteConfig } from "@/lib/config";
 
 const stats = [
   { value: "1.5+", label: "Years in AI/ML" },
   { value: "9", label: "Production projects" },
   { value: "8.83", label: "M.S. CGPA" },
-];
-
-/* Agent orchestration graph (8 nodes / 11 edges). */
-const NODES = [
-  { id: "triage", x: 210, y: 42, label: "triage" },
-  { id: "route", x: 210, y: 112, label: "route" },
-  { id: "rag", x: 92, y: 184, label: "rag" },
-  { id: "sql", x: 210, y: 184, label: "sql" },
-  { id: "tool", x: 328, y: 184, label: "tool" },
-  { id: "memory", x: 92, y: 262, label: "memory" },
-  { id: "synth", x: 210, y: 256, label: "synth" },
-  { id: "out", x: 210, y: 316, label: "out" },
-] as const;
-
-const NI = Object.fromEntries(NODES.map((n, i) => [n.id, i])) as Record<string, number>;
-
-const EDGES: [string, string][] = [
-  ["triage", "route"],
-  ["route", "rag"],
-  ["route", "sql"],
-  ["route", "tool"],
-  ["rag", "synth"],
-  ["sql", "synth"],
-  ["tool", "synth"],
-  ["synth", "out"],
-  ["route", "memory"],
-  ["memory", "synth"],
-  ["rag", "memory"],
 ];
 
 const container = { hidden: {}, show: { transition: { staggerChildren: 0.1 } } };
@@ -48,103 +20,11 @@ const item = {
   show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } },
 };
 
-function AgentTerminal() {
-  const tiltRef = React.useRef<HTMLDivElement>(null);
-
-  React.useEffect(() => {
-    const el = tiltRef.current;
-    if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    el.style.transition = "transform .25s cubic-bezier(.16,1,.3,1)";
-    const onMove = (e: MouseEvent) => {
-      if (!window.matchMedia("(min-width:760px)").matches) return;
-      const r = el.getBoundingClientRect();
-      const px = (e.clientX - r.left) / r.width - 0.5;
-      const py = (e.clientY - r.top) / r.height - 0.5;
-      el.style.transform = `perspective(1000px) rotateY(${px * 7}deg) rotateX(${-py * 7}deg)`;
-    };
-    const onLeave = () => {
-      el.style.transform = "perspective(1000px) rotateY(0) rotateX(0)";
-    };
-    el.addEventListener("mousemove", onMove);
-    el.addEventListener("mouseleave", onLeave);
-    return () => {
-      el.removeEventListener("mousemove", onMove);
-      el.removeEventListener("mouseleave", onLeave);
-    };
-  }, []);
-
-  return (
-    <div
-      ref={tiltRef}
-      className="glass overflow-hidden rounded-2xl border border-border shadow-[0_40px_120px_-40px_rgba(6,182,212,0.35)] [transform-style:preserve-3d]"
-    >
-      <div className="flex items-center gap-2 border-b border-border bg-white/[0.02] px-4 py-3">
-        <span className="h-3 w-3 rounded-full bg-[#ff5f57]" />
-        <span className="h-3 w-3 rounded-full bg-[#febc2e]" />
-        <span className="h-3 w-3 rounded-full bg-[#28c840]" />
-        <span className="ml-2 font-mono text-xs text-dim">agent_orchestrator.py</span>
-      </div>
-
-      <div className="p-5">
-        <svg viewBox="0 0 420 350" className="w-full" role="img" aria-label="Agent orchestration graph">
-          <defs>
-            <radialGradient id="hero-node">
-              <stop offset="0%" stopColor="#06B6D4" />
-              <stop offset="100%" stopColor="#2563EB" />
-            </radialGradient>
-          </defs>
-
-          {EDGES.map(([a, b], i) => {
-            const s = NODES[NI[a]];
-            const t = NODES[NI[b]];
-            return (
-              <line
-                key={`e-${i}`}
-                x1={s.x}
-                y1={s.y}
-                x2={t.x}
-                y2={t.y}
-                stroke="#06B6D4"
-                strokeWidth={1.2}
-                strokeDasharray="4 6"
-                className="animate-edge-pulse"
-                style={{ animationDelay: `${(i % 5) * 0.35}s` }}
-              />
-            );
-          })}
-
-          {NODES.map((n, i) => (
-            <g key={n.id}>
-              <circle
-                cx={n.x}
-                cy={n.y}
-                r={6}
-                fill="url(#hero-node)"
-                className="animate-node-breathe"
-                style={{ transformBox: "fill-box", transformOrigin: "center", animationDelay: `${(i % 4) * 0.5}s` }}
-              />
-              <text x={n.x} y={n.y + 18} textAnchor="middle" className="fill-dim font-mono" style={{ fontSize: "9px" }}>
-                {n.label}
-              </text>
-            </g>
-          ))}
-        </svg>
-
-        <div className="mt-3 space-y-1 font-mono text-[0.7rem] leading-relaxed text-dim">
-          <p>
-            <span className="text-secondary">graph</span> = StateGraph(AgentState)
-          </p>
-          <p># triage &rarr; route &rarr; tools &rarr; synth &rarr; out</p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export function Hero() {
   return (
     <section id="top" className="relative flex min-h-screen items-center overflow-hidden pt-28">
-      <div className="mx-auto grid w-full max-w-[1200px] items-center gap-12 px-6 lg:grid-cols-[1.15fr_1fr]">
+      <div className="mx-auto grid w-full max-w-[1200px] items-center gap-12 px-6 lg:grid-cols-[1.1fr_1fr]">
+        {/* Left column */}
         <motion.div variants={container} initial="hidden" animate="show">
           <motion.div variants={item}>
             <span className="inline-flex items-center gap-2">
@@ -178,7 +58,7 @@ export function Hero() {
             </a>
             <a href={contact.resume} target="_blank" rel="noopener noreferrer">
               <Button variant="outline">
-                <Download className="h-4 w-4" /> Résumé
+                <Download className="h-4 w-4" /> Resume
               </Button>
             </a>
             <a href={contact.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub">
@@ -207,16 +87,17 @@ export function Hero() {
           </motion.dl>
         </motion.div>
 
-        {siteConfig.showAgentGraph && (
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="hidden min-[760px]:block"
-          >
-            <AgentTerminal />
-          </motion.div>
-        )}
+        {/* Right column: two live panels, stacked */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <div className="flex flex-col gap-5">
+            <LiveAgentRun />
+            <VectorSearch />
+          </div>
+        </motion.div>
       </div>
     </section>
   );

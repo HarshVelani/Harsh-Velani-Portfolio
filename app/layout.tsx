@@ -18,7 +18,7 @@ const SITE_URL = siteConfig.siteUrl;
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${identity.name} — AI/ML Engineer & Data Scientist`,
+    default: `${identity.name} - AI/ML Engineer & Data Scientist`,
     template: `%s · ${identity.name}`,
   },
   description: about.shortBio,
@@ -39,14 +39,14 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: SITE_URL,
-    title: `${identity.name} — AI/ML Engineer & Data Scientist`,
+    title: `${identity.name} - AI/ML Engineer & Data Scientist`,
     description: about.shortBio,
     siteName: `${identity.name} Portfolio`,
     images: [{ url: "/og-image.png", width: 1200, height: 630, alt: identity.name }],
   },
   twitter: {
     card: "summary_large_image",
-    title: `${identity.name} — AI/ML Engineer`,
+    title: `${identity.name} - AI/ML Engineer`,
     description: about.shortBio,
     images: ["/og-image.png"],
   },
@@ -101,10 +101,9 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        <AmbientBackground
-          accent={siteConfig.accent}
-          enabled={siteConfig.ambientField}
-        />
+        {/* Ambient field palette is intentionally fixed cyan (independent of
+            the accent config); only the on/off toggle is configurable. */}
+        <AmbientBackground accent="#06B6D4" enabled={siteConfig.ambientField} />
         <ScrollProgress />
         <Nav />
         {children}

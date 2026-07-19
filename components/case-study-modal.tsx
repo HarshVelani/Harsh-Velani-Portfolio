@@ -8,7 +8,7 @@ import type { Project } from "@/types";
 /**
  * Focused case-study modal. Uses your Tailwind tokens (border / muted / fg /
  * secondary=#06B6D4 / accent=#7C3AED / font-display / font-mono). The
- * architecture list is a plain .map() — no nested conditional-in-loop — so
+ * architecture list is a plain .map() - no nested conditional-in-loop - so
  * steps never duplicate.
  */
 const pad = (n: number) => String(n).padStart(2, "0");

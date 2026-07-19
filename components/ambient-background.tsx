@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 
 /**
- * AmbientBackground — a page-wide "neural field" (inspired by Google
+ * AmbientBackground - a page-wide "neural field" (inspired by Google
  * Antigravity's whole-page particle system, tuned for AI/ML content).
  *
  * - Uniform, edge-to-edge particles that drift gently UPWARD ("anti-gravity")
@@ -54,7 +54,13 @@ export function AmbientBackground({ accent = "#06B6D4", enabled = true }: Props)
     });
     const seed = () => { pts = Array.from({ length: count() }, make); qIdx = -1; qClock = 0; };
     const resize = () => {
-      W = window.innerWidth; H = window.innerHeight;
+      // Only react to real VIEWPORT changes. The canvas is fixed to the
+      // viewport, but the observer also fires when page height changes (e.g.
+      // the hero's live panels stream text and grow/shrink). Reseeding on those
+      // made the whole field jump. Bail out when width/height are unchanged.
+      const nw = window.innerWidth, nh = window.innerHeight;
+      if (nw === W && nh === H) return;
+      W = nw; H = nh;
       canvas.width = Math.floor(W * dpr); canvas.height = Math.floor(H * dpr);
       canvas.style.width = W + "px"; canvas.style.height = H + "px";
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0); seed();

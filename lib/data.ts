@@ -33,21 +33,21 @@ export const identity = {
   ],
   // 30-second elevator pitch (hero subhead).
   pitch:
-    "I build production-grade agentic AI — multi-agent systems, retrieval pipelines, and fine-tuned LLMs that ship, from FastAPI backends to the interfaces on top of them.",
+    "I build production-grade agentic AI - multi-agent systems, retrieval pipelines, and fine-tuned LLMs that ship, from FastAPI backends to the interfaces on top of them.",
 } as const;
 
 /* ---------------------------------------------------------------------------
- * ABOUT  —  narrative, not a resume dump.
+ * ABOUT  -  narrative, not a resume dump.
  * ------------------------------------------------------------------------- */
 export const about = {
   brandStatement:
     "I turn open-ended AI problems into systems that run in production.",
   shortBio:
-    "AI/ML Engineer and Data Scientist with 1.5+ years building generative and agentic AI. I specialize in multi-agent orchestration with LangGraph, retrieval-augmented generation, and memory-efficient LLM fine-tuning — and I take work all the way to a deployed, multi-tenant service.",
+    "AI/ML Engineer and Data Scientist with 1.5+ years building generative and agentic AI. I specialize in multi-agent orchestration with LangGraph, retrieval-augmented generation, and memory-efficient LLM fine-tuning - and I take work all the way to a deployed, multi-tenant service.",
   longBio: [
-    "My work sits where machine learning meets real software engineering. Over the last year and a half I've shipped document-intelligence platforms, conversational assistants, and an end-to-end AutoML system — each one an agentic pipeline rather than a single model call.",
+    "My work sits where machine learning meets real software engineering. Over the last year and a half I've shipped document-intelligence platforms, conversational assistants, and an end-to-end AutoML system - each one an agentic pipeline rather than a single model call.",
     "I'm most at home designing the graph: how agents route decisions, when to retrieve, how tools compose, and where a fallback keeps the system reliable. That means hybrid search over vector databases, natural-language-to-query translation, VLM-based extraction, and QLoRA fine-tuning when a task needs a specialized model.",
-    "I care about the parts recruiters rarely see on a demo reel — RBAC, rate limiting, audit logging, async job handling, tenant isolation — because that's the difference between a notebook and a service enterprises can actually use.",
+    "I care about the parts recruiters rarely see on a demo reel - RBAC, rate limiting, audit logging, async job handling, tenant isolation - because that's the difference between a notebook and a service enterprises can actually use.",
   ],
   focus: [
     "Agentic AI & multi-agent orchestration",
@@ -59,7 +59,7 @@ export const about = {
 } as const;
 
 /* ---------------------------------------------------------------------------
- * SKILLS  —  grouped for the skills grid.
+ * SKILLS  -  grouped for the skills grid.
  * ------------------------------------------------------------------------- */
 export const skillGroups: SkillGroup[] = [
   {
@@ -163,7 +163,7 @@ export const skillGroups: SkillGroup[] = [
 ];
 
 /* ---------------------------------------------------------------------------
- * PROJECTS  —  9 projects, split into Featured (case-study cards) and
+ * PROJECTS  -  9 projects, split into Featured (case-study cards) and
  * AI/ML (model-centric cards). Impact is described in terms of delivered
  * capability; no invented KPIs.
  * ------------------------------------------------------------------------- */
@@ -175,11 +175,11 @@ export const projects: Project[] = [
     category: "featured",
     tagline: "Document Processing API-as-a-Service",
     problem:
-      "Enterprises drown in unstructured documents — passports, certificates, insurance policies, financials — that need extraction, validation, and fraud checks at scale, per-tenant.",
+      "Enterprises drown in unstructured documents - passports, certificates, insurance policies, financials - that need extraction, validation, and fraud checks at scale, per-tenant.",
     solution:
       "A multi-tenant Document Processing API that uses Vision-Language Models to extract and validate structured data, wrapped in an asynchronous two-stage pipeline.",
     impact:
-      "Turns manual document review into an automated service with classification, fraud detection, duplicate checks, quality scoring, and external verification — consumable by any tenant via API.",
+      "Turns manual document review into an automated service with classification, fraud detection, duplicate checks, quality scoring, and external verification - consumable by any tenant via API.",
     challenges:
       "Isolating tenants safely while keeping throughput high, and making a two-stage VLM pipeline reliable enough for financial and identity documents.",
     architecture: [
@@ -214,7 +214,7 @@ export const projects: Project[] = [
     category: "featured",
     tagline: "Agentic End-to-End AutoML Platform",
     problem:
-      "Building an ML model end-to-end — from raw dataset to trained model, metrics, and a written report — is slow and demands ML expertise most teams don't have on hand.",
+      "Building an ML model end-to-end - from raw dataset to trained model, metrics, and a written report - is slow and demands ML expertise most teams don't have on hand.",
     solution:
       "An agentic AutoML platform that automates the full workflow using LangGraph orchestration and Groq LLMs for pipeline planning, code generation, and model evaluation.",
     impact:
@@ -323,7 +323,7 @@ export const projects: Project[] = [
     category: "featured",
     tagline: "Natural-Language Analytics & Visualization",
     problem:
-      "Non-technical users want to ask questions of a database in plain English and get both the answer and a chart — without writing SQL or plotting code.",
+      "Non-technical users want to ask questions of a database in plain English and get both the answer and a chart - without writing SQL or plotting code.",
     solution:
       "A GenAI app built on LangGraph and MySQL that interprets natural-language questions, runs the analysis, and returns dynamic visualizations plus textual summaries.",
     impact:
@@ -393,7 +393,7 @@ export const projects: Project[] = [
     problem:
       "Drivers need hands-free answers about a vehicle by VIN, in real time, with natural speech in and speech out.",
     solution:
-      "A real-time speech-to-speech assistant on LiveKit using Deepgram STT, a Groq LLM with TTS, and Silero for voice-activity detection — with VIN validation and NHTSA decoding.",
+      "A real-time speech-to-speech assistant on LiveKit using Deepgram STT, a Groq LLM with TTS, and Silero for voice-activity detection - with VIN validation and NHTSA decoding.",
     impact:
       "Conversational, VIN-based vehicle Q&A: structured validation plus external decoding delivers contextual spoken answers.",
     challenges:
@@ -480,16 +480,16 @@ export const projects: Project[] = [
 ];
 
 /* ---------------------------------------------------------------------------
- * EXPERIENCE  —  timeline.
+ * EXPERIENCE  -  timeline.
  * ------------------------------------------------------------------------- */
 export const experience: ExperienceRole[] = [
   {
     company: "NowOnline Tech India Pvt. Ltd.",
     role: "Data Scientist",
     location: "Gandhinagar, India",
-    period: "Jul 2025 — Present",
+    period: "Jul 2025 - Present",
     summary:
-      "Building production AI platforms: document intelligence, agentic assistants, and AutoML — end to end.",
+      "Building production AI platforms: document intelligence, agentic assistants, and AutoML - end to end.",
     highlights: [
       "Shipped DocLens AI, a multi-tenant VLM document-processing API with fraud detection and RBAC.",
       "Built a LangGraph RAG assistant with hybrid search across Pinecone & Qdrant and NL-to-Mongosh querying.",
@@ -502,7 +502,7 @@ export const experience: ExperienceRole[] = [
     company: "ViitorCloud Technologies Pvt. Ltd.",
     role: "AI/ML Engineer Intern",
     location: "Ahmedabad, India",
-    period: "Feb 2025 — Jul 2025",
+    period: "Feb 2025 - Jul 2025",
     summary:
       "Delivered agentic assistants, GenAI analytics, and real-time voice AI across client projects.",
     highlights: [
@@ -517,7 +517,7 @@ export const experience: ExperienceRole[] = [
     company: "Geo Spatial One Pvt. Ltd.",
     role: "Data Science Intern",
     location: "Rajasthan, India",
-    period: "May 2024 — Jul 2024",
+    period: "May 2024 - Jul 2024",
     summary:
       "Applied deep learning and computer vision to agricultural disease detection.",
     highlights: [
@@ -536,7 +536,7 @@ export const education: EducationItem[] = [
     institution: "Dhirubhai Ambani University (DAIICT)",
     degree: "Master in Data Analytics",
     detail: "CGPA: 8.83 / 10",
-    period: "Jul 2023 — Jul 2025",
+    period: "Jul 2023 - Jul 2025",
     location: "Gandhinagar, Gujarat",
   },
 ];
@@ -546,16 +546,16 @@ export const education: EducationItem[] = [
  * ------------------------------------------------------------------------- */
 export const certifications: string[] = [
   "Building, Deploying & Optimizing Generative AI with LangChain & HuggingFace",
-  "Complete Data Analyst Bootcamp — Basics to Advanced",
+  "Complete Data Analyst Bootcamp - Basics to Advanced",
   "DBMS and MySQL",
   "Advanced Excel, Power BI & Tableau",
-  "Excel Skills for Business — Job Simulation",
+  "Excel Skills for Business - Job Simulation",
 ];
 
 export const achievements: { title: string; detail: string; icon: string }[] = [
   {
     title: "Gold Badge in SQL",
-    detail: "HackerRank — top proficiency tier",
+    detail: "HackerRank - top proficiency tier",
     icon: "Award",
   },
   {
@@ -576,7 +576,7 @@ export const achievements: { title: string; detail: string; icon: string }[] = [
 ];
 
 /* ---------------------------------------------------------------------------
- * TECH STACK  —  flat marquee list for the tech-stack strip.
+ * TECH STACK  -  flat marquee list for the tech-stack strip.
  * ------------------------------------------------------------------------- */
 export const techStack: string[] = [
   "Python",

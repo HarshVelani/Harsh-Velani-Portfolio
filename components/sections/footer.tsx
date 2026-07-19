@@ -91,7 +91,7 @@ export function Footer() {
                 suppressHydrationWarning span lets the build-time and runtime
                 years differ (e.g. across New Year) without a hydration error. */}
             © <span suppressHydrationWarning>{new Date().getFullYear()}</span>{" "}
-            {identity.name}. Built with Next.js & Tailwind CSS.
+            {identity.name}.
           </p>
           <a href="#top">
             <Button variant="ghost" size="sm">

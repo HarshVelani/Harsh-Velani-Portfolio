@@ -13,7 +13,7 @@ export function Experience() {
       index={3}
       eyebrow="Experience"
       title="Where I've shipped"
-      intro="A short, dense timeline — three roles, one trajectory toward production AI."
+      intro="A short, dense timeline - three roles, one trajectory toward production AI."
     >
       <div className="relative">
         {/* Vertical spine */}

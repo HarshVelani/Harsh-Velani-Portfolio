@@ -59,7 +59,7 @@ export function Contact() {
       `Portfolio message from ${name || "a visitor"}`
     );
     const body = encodeURIComponent(
-      `${message}\n\n— ${name}${email ? ` (${email})` : ""}`
+      `${message}\n\n- ${name}${email ? ` (${email})` : ""}`
     );
     window.location.href = `mailto:${contact.email}?subject=${subject}&body=${body}`;
   };
